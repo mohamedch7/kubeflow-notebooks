@@ -99,11 +99,11 @@ func (a *App) Routes() http.Handler {
 	router.GET(WorkspacesByNamePath, a.GetWorkspaceHandler)
 	router.POST(WorkspacesByNamespacePath, a.CreateWorkspaceHandler)
 	router.DELETE(WorkspacesByNamePath, a.DeleteWorkspaceHandler)
-  router.GET(WorkspaceYAMLPath, a.GetWorkspaceYAMLHandler)
+	router.GET(WorkspaceYAMLPath, a.GetWorkspaceYAMLHandler)
 
 	// workspacekinds
 	router.GET(AllWorkspaceKindsPath, a.GetWorkspaceKindsHandler)
 	router.GET(WorkspaceKindsByNamePath, a.GetWorkspaceKindHandler)
 
-	return a.RecoverPanic(a.enableCORS(router))
+	return a.recoverPanic(a.enableCORS(router))
 }
