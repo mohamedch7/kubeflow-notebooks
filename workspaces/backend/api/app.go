@@ -41,6 +41,8 @@ const (
 	WorkspaceNamePathParam    = "name"
 	WorkspacesByNamespacePath = AllWorkspacesPath + "/:" + NamespacePathParam
 	WorkspacesByNamePath      = AllWorkspacesPath + "/:" + NamespacePathParam + "/:" + WorkspaceNamePathParam
+	WorkspaceDetailsPrefix    = AllWorkspacesPath + "/:" + NamespacePathParam + "/:" + WorkspaceNamePathParam + "/details"
+	WorkspaceYAMLPath         = WorkspaceDetailsPrefix + "/yaml"
 
 	// workspacekinds
 	AllWorkspaceKindsPath      = PathPrefix + "/workspacekinds"
@@ -85,6 +87,8 @@ func (a *App) Routes() http.Handler {
 
 	router.GET(AllWorkspaceKindsPath, a.GetWorkspaceKindsHandler)
 	router.GET(WorkspaceKindsByNamePath, a.GetWorkspaceKindHandler)
+
+	router.GET(WorkspaceYAMLPath, a.GetWorkspaceYAMLHandler)
 
 	return a.RecoverPanic(a.enableCORS(router))
 }
