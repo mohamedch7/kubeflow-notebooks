@@ -46,7 +46,16 @@ func (a *App) LogError(r *http.Request, err error) {
 	a.logger.Error(err.Error(), "method", method, "uri", uri)
 }
 
-// nolint:unused
+func (a *App) LogWarn(r *http.Request, message string) {
+	var (
+		method = r.Method
+		uri    = r.URL.RequestURI()
+	)
+
+	a.logger.Warn(message, "method", method, "uri", uri)
+}
+
+//nolint:unused
 func (a *App) badRequestResponse(w http.ResponseWriter, r *http.Request, err error) {
 	httpError := &HTTPError{
 		StatusCode: http.StatusBadRequest,
@@ -58,13 +67,13 @@ func (a *App) badRequestResponse(w http.ResponseWriter, r *http.Request, err err
 	a.errorResponse(w, r, httpError)
 }
 
-func (a *App) errorResponse(w http.ResponseWriter, r *http.Request, error *HTTPError) {
-	env := ErrorEnvelope{Error: error}
+func (a *App) errorResponse(w http.ResponseWriter, r *http.Request, httpError *HTTPError) {
+	env := ErrorEnvelope{Error: httpError}
 
-	err := a.WriteJSON(w, error.StatusCode, env, nil)
+	err := a.WriteJSON(w, httpError.StatusCode, env, nil)
 	if err != nil {
 		a.LogError(r, err)
-		w.WriteHeader(error.StatusCode)
+		w.WriteHeader(httpError.StatusCode)
 	}
 }
 
@@ -103,7 +112,31 @@ func (a *App) methodNotAllowedResponse(w http.ResponseWriter, r *http.Request) {
 	a.errorResponse(w, r, httpError)
 }
 
-// nolint:unused
+func (a *App) unauthorizedResponse(w http.ResponseWriter, r *http.Request) {
+	httpError := &HTTPError{
+		StatusCode: http.StatusUnauthorized,
+		ErrorResponse: ErrorResponse{
+			Code:    strconv.Itoa(http.StatusUnauthorized),
+			Message: "authentication is required to access this resource",
+		},
+	}
+	a.errorResponse(w, r, httpError)
+}
+
+func (a *App) forbiddenResponse(w http.ResponseWriter, r *http.Request, msg string) {
+	a.LogWarn(r, msg)
+
+	httpError := &HTTPError{
+		StatusCode: http.StatusForbidden,
+		ErrorResponse: ErrorResponse{
+			Code:    strconv.Itoa(http.StatusForbidden),
+			Message: "you are not authorized to access this resource",
+		},
+	}
+	a.errorResponse(w, r, httpError)
+}
+
+//nolint:unused
 func (a *App) failedValidationResponse(w http.ResponseWriter, r *http.Request, errors map[string]string) {
 	message, err := json.Marshal(errors)
 	if err != nil {

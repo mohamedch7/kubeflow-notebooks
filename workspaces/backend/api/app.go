@@ -22,6 +22,8 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apiserver/pkg/authentication/authenticator"
+	"k8s.io/apiserver/pkg/authorization/authorizer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/kubeflow/notebooks/workspaces/backend/internal/config"
@@ -48,23 +50,32 @@ const (
 	AllWorkspaceKindsPath      = PathPrefix + "/workspacekinds"
 	WorkspaceKindNamePathParam = "name"
 	WorkspaceKindsByNamePath   = AllWorkspaceKindsPath + "/:" + WorkspaceNamePathParam
+
+	// namespaces
+	AllNamespacesPath = PathPrefix + "/namespaces"
 )
 
 type App struct {
-	Config       config.EnvConfig
+	Config       *config.EnvConfig
 	logger       *slog.Logger
 	repositories *repositories.Repositories
 	Scheme       *runtime.Scheme
+	RequestAuthN authenticator.Request
+	RequestAuthZ authorizer.Authorizer
 }
 
 // NewApp creates a new instance of the app
-func NewApp(cfg config.EnvConfig, logger *slog.Logger, client client.Client, scheme *runtime.Scheme) (*App, error) {
+func NewApp(cfg *config.EnvConfig, logger *slog.Logger, cl client.Client, scheme *runtime.Scheme, reqAuthN authenticator.Request, reqAuthZ authorizer.Authorizer) (*App, error) {
+
+	// TODO: log the configuration on startup
 
 	app := &App{
 		Config:       cfg,
 		logger:       logger,
-		repositories: repositories.NewRepositories(client),
+		repositories: repositories.NewRepositories(cl),
 		Scheme:       scheme,
+		RequestAuthN: reqAuthN,
+		RequestAuthZ: reqAuthZ,
 	}
 	return app, nil
 }
@@ -76,19 +87,23 @@ func (a *App) Routes() http.Handler {
 	router.NotFound = http.HandlerFunc(a.notFoundResponse)
 	router.MethodNotAllowed = http.HandlerFunc(a.methodNotAllowedResponse)
 
-	router.GET(HealthCheckPath, a.HealthcheckHandler)
+	// healthcheck
+	router.GET(HealthCheckPath, a.GetHealthcheckHandler)
 
+	// namespaces
+	router.GET(AllNamespacesPath, a.GetNamespacesHandler)
+
+	// workspaces
 	router.GET(AllWorkspacesPath, a.GetWorkspacesHandler)
 	router.GET(WorkspacesByNamespacePath, a.GetWorkspacesHandler)
-
 	router.GET(WorkspacesByNamePath, a.GetWorkspaceHandler)
 	router.POST(WorkspacesByNamespacePath, a.CreateWorkspaceHandler)
 	router.DELETE(WorkspacesByNamePath, a.DeleteWorkspaceHandler)
+  router.GET(WorkspaceYAMLPath, a.GetWorkspaceYAMLHandler)
 
+	// workspacekinds
 	router.GET(AllWorkspaceKindsPath, a.GetWorkspaceKindsHandler)
 	router.GET(WorkspaceKindsByNamePath, a.GetWorkspaceKindHandler)
-
-	router.GET(WorkspaceYAMLPath, a.GetWorkspaceYAMLHandler)
 
 	return a.RecoverPanic(a.enableCORS(router))
 }

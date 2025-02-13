@@ -22,7 +22,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (a *App) HealthcheckHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (a *App) GetHealthcheckHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	healthCheck, err := a.repositories.HealthCheck.HealthCheck(Version)
 	if err != nil {
@@ -34,5 +34,4 @@ func (a *App) HealthcheckHandler(w http.ResponseWriter, r *http.Request, ps http
 	if err != nil {
 		a.serverErrorResponse(w, r, err)
 	}
-
 }

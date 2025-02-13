@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { NotFound } from './pages/notFound/NotFound';
-import { Settings } from './pages/Settings/Settings';
-import { Dashboard } from './pages/Dashboard/Dashboard';
+import { Debug } from './pages/Debug/Debug';
+import { Workspaces } from './pages/Workspaces/Workspaces';
+import '~/shared/style/MUI-theme.scss';
 
 export const isNavDataGroup = (navItem: NavDataItem): navItem is NavDataGroup =>
   'children' in navItem;
@@ -21,7 +22,7 @@ export type NavDataGroup = NavDataCommon & {
 
 type NavDataItem = NavDataHref | NavDataGroup;
 
-export const useAdminSettings = (): NavDataItem[] => {
+export const useAdminDebugSettings = (): NavDataItem[] => {
   // get auth access for example set admin as true
   const isAdmin = true; //this should be a call to getting auth / role access
 
@@ -33,8 +34,8 @@ export const useAdminSettings = (): NavDataItem[] => {
 
   return [
     {
-      label: 'Settings',
-      children: [{ label: 'Notebooks', path: '/notebookSettings' }],
+      label: 'Debug',
+      children: [{ label: 'Notebooks', path: '/notebookDebugSettings' }],
     },
   ];
 };
@@ -44,7 +45,7 @@ export const useNavData = (): NavDataItem[] => [
     label: 'Notebooks',
     path: '/',
   },
-  ...useAdminSettings(),
+  ...useAdminDebugSettings(),
 ];
 
 const AppRoutes: React.FC = () => {
@@ -52,14 +53,12 @@ const AppRoutes: React.FC = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<Dashboard />} />
+      <Route path="/" element={<Workspaces />} />
       <Route path="*" element={<NotFound />} />
       {
         // TODO: Remove the linter skip when we implement authentication
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        isAdmin && (
-          <Route path="/notebookSettings/*" element={<Settings />} />
-        )
+        isAdmin && <Route path="/notebookDebugSettings/*" element={<Debug />} />
       }
     </Routes>
   );
