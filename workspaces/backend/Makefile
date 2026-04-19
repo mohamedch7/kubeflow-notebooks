@@ -59,7 +59,7 @@ vet: ## Run go vet against code.
 	go vet ./...
 
 .PHONY: test
-test: fmt vet envtest ## Run tests.
+test: swag fmt vet envtest ## Run tests.
 	$(eval KUBEBUILDER_ASSETS := $(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) --bin-dir $(LOCALBIN) -p path))
 	## For unknown reasons, setup-envtest changes the binary permissions to 0555,
 	## this makes it difficult to clean up the downloaded binaries later.
@@ -131,7 +131,7 @@ SWAGGER = $(LOCALBIN)/swag
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v5.5.0
 ENVTEST_VERSION ?= release-0.19
-GOLANGCI_LINT_VERSION ?= v1.61.0
+GOLANGCI_LINT_VERSION ?= v1.64.8
 SWAGGER_VERSION ?= v1.16.6
 
 .PHONY: SWAGGER
