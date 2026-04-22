@@ -2715,6 +2715,21 @@ const docTemplate = `{
                 }
             }
         },
+        "workspacekinds.RuleEffects": {
+            "type": "object",
+            "required": [
+                "aclDeny",
+                "uiHide"
+            ],
+            "properties": {
+                "aclDeny": {
+                    "type": "boolean"
+                },
+                "uiHide": {
+                    "type": "boolean"
+                }
+            }
+        },
         "workspacekinds.WorkspaceKind": {
             "type": "object",
             "required": [
@@ -2727,7 +2742,8 @@ const docTemplate = `{
                 "icon",
                 "logo",
                 "name",
-                "podTemplate"
+                "podTemplate",
+                "ruleEffects"
             ],
             "properties": {
                 "clusterMetrics": {
@@ -2759,6 +2775,9 @@ const docTemplate = `{
                 },
                 "podTemplate": {
                     "$ref": "#/definitions/workspacekinds.PodTemplate"
+                },
+                "ruleEffects": {
+                    "$ref": "#/definitions/workspacekinds.RuleEffects"
                 }
             }
         },
