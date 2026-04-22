@@ -41,6 +41,11 @@ spec:
       #configMap:
       #   name: "my-logos"
       #   key: "Jupyter_logo.svg"
+    // ruleEffects determine the effects of any rules associated with this WorkspaceKind
+    //  - for example, if a rule has `uiHide: true`, then the Workspace of this WorkspaceKind will be hidden from the UI
+    ruleEffects:
+      uiHide: false
+      aclDeny: false
 
   ## ================================================================
   ## DEFINITION CONFIGS
