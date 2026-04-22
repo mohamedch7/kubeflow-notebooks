@@ -29,6 +29,7 @@ type WorkspaceKind struct {
 	Logo               ImageRef           `json:"logo"`
 	ClusterMetrics     ClusterKindMetrics `json:"clusterMetrics"`
 	PodTemplate        PodTemplate        `json:"podTemplate"`
+	RuleEffects        RuleEffects        `json:"ruleEffects"`
 }
 
 type ClusterKindMetrics struct {
@@ -56,4 +57,9 @@ type PodMetadata struct {
 
 type PodVolumeMounts struct {
 	Home string `json:"home"`
+}
+
+type RuleEffects struct {
+	UIHide  bool `json:"uiHide"`
+	ACLDeny bool `json:"aclDeny"`
 }
